@@ -257,9 +257,11 @@ local Library = {
     Black = Color3.new(0, 0, 0);
     Font = SafeFontFromEnum(Enum.Font.Code, Enum.Font.Code),
     FontName = "Code",
-    TextSizeOffset = 0,
-    FontRegistry = {},
-    FontOrder = {},
+    TextSizeOffset = 14,
+    FontRegistry = {
+        Code = SafeFontFromEnum(Enum.Font.Code, Enum.Font.Code),
+    },
+    FontOrder = { "Code" },
 
     -- frames --
     OpenedFrames = {};
@@ -330,7 +332,15 @@ local function ApplyDPIScale(Position)
 end
 
 local function ApplyTextScale(TextSize)
-    return (TextSize + (Library.TextSizeOffset or 0)) * DPIScale
+    local SelectedSize = tonumber(Library.TextSizeOffset) or 14
+
+    -- Backward compatibility for older saved values that were offsets.
+    if SelectedSize >= -8 and SelectedSize <= 8 then
+        SelectedSize = 14 + SelectedSize
+    end
+
+    SelectedSize = math.clamp(SelectedSize, 10, 24)
+    return SelectedSize * DPIScale
 end
 
 local function IsTextObject(Instance)
@@ -367,17 +377,6 @@ local function GetTableSize(t)
     return n
 end
 
-for _, EnumFont in ipairs(Enum.Font:GetEnumItems()) do
-    local Name = EnumFont.Name
-    local FontValue = SafeFontFromEnum(EnumFont, nil)
-    if EnumFont ~= Enum.Font.Unknown and FontValue then
-        Library.FontRegistry[Name] = FontValue
-        table.insert(Library.FontOrder, Name)
-    end
-end
-
-table.sort(Library.FontOrder)
-
 function Library:GetAvailableFonts()
     return table.clone(self.FontOrder)
 end
@@ -392,7 +391,7 @@ function Library:RegisterFonts(FontTable)
     end
 
     for Name, FontValue in next, FontTable do
-        if typeof(Name) == "string" and (typeof(FontValue) == "Font" or typeof(FontValue) == "EnumItem") then
+        if typeof(Name) == "string" and typeof(FontValue) == "Font" then
             self.FontRegistry[Name] = FontValue
             if not table.find(self.FontOrder, Name) then
                 table.insert(self.FontOrder, Name)
@@ -425,7 +424,35 @@ function Library:SetFont(FontValue)
     self.Font = ResolvedFont
     self.FontName = ResolvedName or self.FontName
     self:UpdateColorsUsingRegistry()
+    self:RefreshTextObjects()
     return true
+end
+
+function Library:RefreshTextObjects()
+    for _, Desc in ipairs(ScreenGui:GetDescendants()) do
+        if IsTextObject(Desc) then
+            pcall(function()
+                ApplyInstanceProperty(Desc, "Font", self.Font)
+            end)
+
+            pcall(function()
+                Desc.TextSize = ApplyTextScale(GetBaseTextSize(Desc))
+            end)
+        end
+    end
+
+    if self.Watermark and self.WatermarkText then
+        self:SetWatermark(self.WatermarkText.Text or "")
+    end
+
+    for _, Option in next, Options do
+        if Option.Type == "Dropdown" then
+            pcall(function()
+                Option:BuildDropdownList()
+                Option:Display()
+            end)
+        end
+    end
 end
 
 function Library:SetTextSizeOffset(Value)
@@ -433,6 +460,7 @@ function Library:SetTextSizeOffset(Value)
 
     self.TextSizeOffset = Value
     self:UpdateColorsUsingRegistry()
+    self:RefreshTextObjects()
 end
 
 local function GetPlayers(ExcludeLocalPlayer, ReturnInstances)
@@ -1117,6 +1145,7 @@ function Library:GetTextBounds(Text, Font, Size, Resolution)
 
     local CleanText = Text:gsub("<%/?[%w:]+[^>]*>", "")
     Font = Font or Library.Font
+    Size = ApplyTextScale(Size)
 
     if typeof(Font) == "Font" then
         local ok, Bounds = pcall(function()
@@ -6335,8 +6364,9 @@ end
 --// Watermark \\--
 do
     local WatermarkOuter = Library:Create("Frame", {
+        AnchorPoint = Vector2.new(0.5, 0);
         BorderColor3 = Color3.new(0, 0, 0);
-        Position = UDim2.new(0, 100, 0, -25);
+        Position = UDim2.new(0.5, 0, 0, 6);
         Size = UDim2.new(0, 213, 0, 20);
         ZIndex = 200;
         Visible = false;
@@ -6402,7 +6432,9 @@ do
 
     function Library:SetWatermark(Text)
         local X, Y = Library:GetTextBounds(Text, Library.Font, 14)
-        Library.Watermark.Size = UDim2.new(0, X + 15, 0, (Y * 1.5) + 3)
+        local PadX = math.max(18, math.floor((tonumber(Library.TextSizeOffset) or 14) * 1.4))
+        local PadY = math.max(6, math.floor((tonumber(Library.TextSizeOffset) or 14) * 0.45))
+        Library.Watermark.Size = UDim2.new(0, X + PadX, 0, Y + PadY)
         Library:SetWatermarkVisibility(true)
 
         Library.WatermarkText.Text = Text
