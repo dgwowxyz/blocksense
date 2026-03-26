@@ -257,7 +257,7 @@ local Library = {
     Black = Color3.new(0, 0, 0);
     Font = SafeFontFromEnum(Enum.Font.Code, Enum.Font.Code),
     FontName = "Code",
-    TextSizeOffset = 14,
+    TextSizeOffset = 12,
     FontRegistry = {
         Code = SafeFontFromEnum(Enum.Font.Code, Enum.Font.Code),
     },
@@ -332,15 +332,15 @@ local function ApplyDPIScale(Position)
 end
 
 local function ApplyTextScale(TextSize)
-    local SelectedSize = tonumber(Library.TextSizeOffset) or 14
+    local SelectedSize = tonumber(Library.TextSizeOffset) or 12
 
     -- Backward compatibility for older saved values that were offsets.
     if SelectedSize >= -8 and SelectedSize <= 8 then
         SelectedSize = 14 + SelectedSize
     end
 
-    SelectedSize = math.clamp(SelectedSize, 10, 24)
-    return SelectedSize * DPIScale
+    SelectedSize = math.clamp(SelectedSize, 7, 20)
+    return math.floor(SelectedSize + 0.5)
 end
 
 local function IsTextObject(Instance)
@@ -462,7 +462,7 @@ end
 function Library:SetTextSizeOffset(Value)
     assert(type(Value) == "number", "Expected number for text size offset")
 
-    self.TextSizeOffset = Value
+    self.TextSizeOffset = math.clamp(math.floor(Value + 0.5), 7, 20)
     self:UpdateColorsUsingRegistry()
     self:RefreshTextObjects()
 end
@@ -6436,8 +6436,8 @@ do
 
     function Library:SetWatermark(Text)
         local X, Y = Library:GetTextBounds(Text, Library.Font, 14)
-        local PadX = math.max(18, math.floor((tonumber(Library.TextSizeOffset) or 14) * 1.4))
-        local PadY = math.max(6, math.floor((tonumber(Library.TextSizeOffset) or 14) * 0.45))
+        local PadX = math.max(18, math.floor((tonumber(Library.TextSizeOffset) or 12) * 1.4))
+        local PadY = math.max(6, math.floor((tonumber(Library.TextSizeOffset) or 12) * 0.45))
         Library.Watermark.Size = UDim2.new(0, X + PadX, 0, Y + PadY)
         Library:SetWatermarkVisibility(true)
 
