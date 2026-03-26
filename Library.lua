@@ -399,7 +399,11 @@ function Library:RegisterFonts(FontTable)
         end
     end
 
-    table.sort(self.FontOrder)
+    table.sort(self.FontOrder, function(a, b)
+        if a == "Code" then return true end
+        if b == "Code" then return false end
+        return a < b
+    end)
 end
 
 function Library:SetFont(FontValue)
