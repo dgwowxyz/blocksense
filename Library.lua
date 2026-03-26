@@ -225,6 +225,15 @@ do
 end
 
 local DPIScale = 1;
+local function SafeFontFromEnum(EnumFont, Fallback)
+    local ok, FontValue = pcall(Font.fromEnum, EnumFont)
+    if ok and FontValue then
+        return FontValue
+    end
+
+    return Fallback or Enum.Font.Code
+end
+
 local Library = {
     Registry = {};
     RegistryMap = {};
@@ -246,7 +255,11 @@ local Library = {
     RiskColor = Color3.fromRGB(255, 50, 50);
 
     Black = Color3.new(0, 0, 0);
-    Font = Enum.Font.Code,
+    Font = SafeFontFromEnum(Enum.Font.Code, Enum.Font.Code),
+    FontName = "Code",
+    TextSizeOffset = 0,
+    FontRegistry = {},
+    FontOrder = {},
 
     -- frames --
     OpenedFrames = {};
@@ -317,7 +330,33 @@ local function ApplyDPIScale(Position)
 end
 
 local function ApplyTextScale(TextSize)
-    return TextSize * DPIScale
+    return (TextSize + (Library.TextSizeOffset or 0)) * DPIScale
+end
+
+local function IsTextObject(Instance)
+    return Instance:IsA("TextLabel") or Instance:IsA("TextButton") or Instance:IsA("TextBox")
+end
+
+local function GetBaseTextSize(Instance)
+    local Stored = Instance:GetAttribute("__LibraryBaseTextSize")
+    if typeof(Stored) == "number" then
+        return Stored
+    end
+
+    return math.max(1, math.floor((Instance.TextSize / math.max(DPIScale, 0.01)) + 0.5))
+end
+
+local function ApplyInstanceProperty(Instance, Property, Value)
+    if Property == "Font" then
+        if typeof(Value) == "Font" then
+            Instance.FontFace = Value
+        else
+            Instance.Font = Value
+        end
+        return
+    end
+
+    Instance[Property] = Value
 end
 
 local function GetTableSize(t)
@@ -326,6 +365,74 @@ local function GetTableSize(t)
         n = n + 1
     end
     return n
+end
+
+for _, EnumFont in ipairs(Enum.Font:GetEnumItems()) do
+    local Name = EnumFont.Name
+    local FontValue = SafeFontFromEnum(EnumFont, nil)
+    if EnumFont ~= Enum.Font.Unknown and FontValue then
+        Library.FontRegistry[Name] = FontValue
+        table.insert(Library.FontOrder, Name)
+    end
+end
+
+table.sort(Library.FontOrder)
+
+function Library:GetAvailableFonts()
+    return table.clone(self.FontOrder)
+end
+
+function Library:GetCurrentFontName()
+    return self.FontName
+end
+
+function Library:RegisterFonts(FontTable)
+    if typeof(FontTable) ~= "table" then
+        return
+    end
+
+    for Name, FontValue in next, FontTable do
+        if typeof(Name) == "string" and (typeof(FontValue) == "Font" or typeof(FontValue) == "EnumItem") then
+            self.FontRegistry[Name] = FontValue
+            if not table.find(self.FontOrder, Name) then
+                table.insert(self.FontOrder, Name)
+            end
+        end
+    end
+
+    table.sort(self.FontOrder)
+end
+
+function Library:SetFont(FontValue)
+    local ResolvedName, ResolvedFont = nil, FontValue
+
+    if typeof(FontValue) == "string" then
+        ResolvedName = FontValue
+        ResolvedFont = self.FontRegistry[FontValue]
+    else
+        for Name, RegisteredFont in next, self.FontRegistry do
+            if RegisteredFont == FontValue then
+                ResolvedName = Name
+                break
+            end
+        end
+    end
+
+    if not (typeof(ResolvedFont) == "Font" or typeof(ResolvedFont) == "EnumItem") then
+        return false
+    end
+
+    self.Font = ResolvedFont
+    self.FontName = ResolvedName or self.FontName
+    self:UpdateColorsUsingRegistry()
+    return true
+end
+
+function Library:SetTextSizeOffset(Value)
+    assert(type(Value) == "number", "Expected number for text size offset")
+
+    self.TextSizeOffset = Value
+    self:UpdateColorsUsingRegistry()
 end
 
 local function GetPlayers(ExcludeLocalPlayer, ReturnInstances)
@@ -509,11 +616,14 @@ function Library:Create(Class, Properties)
         if (Property == "Size" or Property == "Position") then
             Value = ApplyDPIScale(Value)
         elseif Property == "TextSize" then
+            if IsTextObject(_Instance) then
+                _Instance:SetAttribute("__LibraryBaseTextSize", Value)
+            end
             Value = ApplyTextScale(Value)
         end
 
         local success, err = pcall(function()
-            _Instance[Property] = Value
+            ApplyInstanceProperty(_Instance, Property, Value)
         end)
 
         if (not success) then
@@ -1005,7 +1115,27 @@ function Library:GetTextBounds(Text, Font, Size, Resolution)
         Resolution = Vector2.new(Resolution, 10000)
     end
 
-    local Bounds = TextService:GetTextSize(Text:gsub("<%/?[%w:]+[^>]*>", ""), Size, Font, Resolution or Vector2.new(1920, 1080))
+    local CleanText = Text:gsub("<%/?[%w:]+[^>]*>", "")
+    Font = Font or Library.Font
+
+    if typeof(Font) == "Font" then
+        local ok, Bounds = pcall(function()
+            local Params = Instance.new("GetTextBoundsParams")
+            Params.Text = CleanText
+            Params.Size = Size
+            Params.Font = Font
+            Params.Width = (Resolution or Vector2.new(1920, 1080)).X
+            return TextService:GetTextBoundsAsync(Params)
+        end)
+
+        if ok and Bounds then
+            return Bounds.X, Bounds.Y
+        end
+
+        Font = Enum.Font.Code
+    end
+
+    local Bounds = TextService:GetTextSize(CleanText, Size, Font, Resolution or Vector2.new(1920, 1080))
     return Bounds.X, Bounds.Y
 end
 
@@ -1017,6 +1147,20 @@ Library.AccentColorDark = Library:GetDarkerColor(Library.AccentColor)
 
 function Library:AddToRegistry(Instance, Properties, IsHud)
     local Idx = #Library.Registry + 1
+    Properties = Properties or {}
+
+    if IsTextObject(Instance) then
+        if Properties.Font == nil then
+            Properties.Font = "Font"
+        end
+
+        if Properties.TextSize == nil then
+            Properties.TextSize = function()
+                return GetBaseTextSize(Instance)
+            end
+        end
+    end
+
     local Data = {
         Instance = Instance;
         Properties = Properties;
@@ -1064,10 +1208,22 @@ function Library:UpdateColorsUsingRegistry()
 
     for Idx, Object in next, Library.Registry do
         for Property, ColorIdx in next, Object.Properties do
+            local Value = ColorIdx
+
             if typeof(ColorIdx) == "string" then
-                Object.Instance[Property] = Library[ColorIdx]
+                Value = Library[ColorIdx]
             elseif typeof(ColorIdx) == "function" then
-                Object.Instance[Property] = ColorIdx()
+                Value = ColorIdx()
+            end
+
+            if Value ~= nil then
+                if Property == "TextSize" then
+                    Value = ApplyTextScale(Value)
+                end
+
+                pcall(function()
+                    ApplyInstanceProperty(Object.Instance, Property, Value)
+                end)
             end
         end
     end
