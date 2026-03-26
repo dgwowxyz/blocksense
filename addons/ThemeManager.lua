@@ -48,7 +48,7 @@ if typeof(clonefunction) == "function" then
 end
 
 local ThemeManager = {} do
-	local ThemeFields = { "FontColor", "MainColor", "AccentColor", "BackgroundColor", "OutlineColor", "VideoLink" }
+	local ThemeFields = { "FontColor", "MainColor", "AccentColor", "BackgroundColor", "OutlineColor", "VideoLink", "UIFont", "UITextSizeOffset" }
 	ThemeManager.Folder = "LinoriaLibSettings"
 	-- if not isfolder(ThemeManager.Folder) then makefolder(ThemeManager.Folder) end
 
@@ -115,6 +115,49 @@ local ThemeManager = {} do
 		self.Library = library
 	end
 
+	local function ApplySpecialThemeField(self, field, value, updateOption)
+		if field == "VideoLink" then
+			self.Library[field] = value
+
+			if updateOption and self.Library.Options[field] then
+				self.Library.Options[field]:SetValue(value)
+			end
+
+			ApplyBackgroundVideo(value)
+			return true
+		end
+
+		if field == "UIFont" then
+			if self.Library.SetFont then
+				self.Library:SetFont(value)
+			end
+
+			if updateOption and self.Library.Options[field] then
+				pcall(function()
+					self.Library.Options[field]:SetValue(value)
+				end)
+			end
+
+			return true
+		end
+
+		if field == "UITextSizeOffset" then
+			local numericValue = tonumber(value) or 0
+
+			if self.Library.SetTextSizeOffset then
+				self.Library:SetTextSizeOffset(numericValue)
+			end
+
+			if updateOption and self.Library.Options[field] then
+				self.Library.Options[field]:SetValue(numericValue)
+			end
+
+			return true
+		end
+
+		return false
+	end
+
 	--// Folders \\--
 	function ThemeManager:GetPaths()
 	    local paths = {}
@@ -165,14 +208,7 @@ local ThemeManager = {} do
 		
 		local scheme = data[2]
 		for idx, col in next, customThemeData or scheme do
-			if idx == "VideoLink" then
-				self.Library[idx] = col
-				
-				if self.Library.Options[idx] then
-					self.Library.Options[idx]:SetValue(col)
-				end
-				
-				ApplyBackgroundVideo(col)
+			if ApplySpecialThemeField(self, idx, col, true) then
 			else
 				self.Library[idx] = Color3.fromHex(col)
 				
@@ -193,10 +229,9 @@ local ThemeManager = {} do
 
 		for i, field in next, ThemeFields do
 			if self.Library.Options and self.Library.Options[field] then
-				self.Library[field] = self.Library.Options[field].Value
-
-				if field == "VideoLink" then
-					ApplyBackgroundVideo(self.Library.Options[field].Value)
+				local Value = self.Library.Options[field].Value
+				if not ApplySpecialThemeField(self, field, Value, false) then
+					self.Library[field] = Value
 				end
 			end
 		end
@@ -257,7 +292,7 @@ local ThemeManager = {} do
 
 		local theme = {}
 		for _, field in next, ThemeFields do
-			if field == "VideoLink" then
+			if field == "VideoLink" or field == "UIFont" or field == "UITextSizeOffset" then
 				theme[field] = self.Library.Options[field].Value
 			else
 				theme[field] = self.Library.Options[field].Value:ToHex()
@@ -315,6 +350,8 @@ local ThemeManager = {} do
 		groupbox:AddLabel('Accent color'):AddColorPicker('AccentColor', { Default = self.Library.AccentColor });
 		groupbox:AddLabel('Outline color'):AddColorPicker('OutlineColor', { Default = self.Library.OutlineColor });
 		groupbox:AddLabel('Font color')	:AddColorPicker('FontColor', { Default = self.Library.FontColor });
+		groupbox:AddDropdown('UIFont', { Text = 'UI font', Values = self.Library:GetAvailableFonts(), Default = self.Library:GetCurrentFontName() });
+		groupbox:AddSlider('UITextSizeOffset', { Text = 'UI text size', Default = self.Library.TextSizeOffset or 14, Min = 10, Max = 24, Rounding = 0, Compact = false });
 		groupbox:AddInput('VideoLink', { Text = '.webm Video Background (Link)', Default = self.Library.VideoLink });
 		
 		local ThemesArray = {}
@@ -411,6 +448,8 @@ local ThemeManager = {} do
 		self.Library.Options.AccentColor:OnChanged(UpdateTheme)
 		self.Library.Options.OutlineColor:OnChanged(UpdateTheme)
 		self.Library.Options.FontColor:OnChanged(UpdateTheme)
+		self.Library.Options.UIFont:OnChanged(UpdateTheme)
+		self.Library.Options.UITextSizeOffset:OnChanged(UpdateTheme)
 	end
 
 	function ThemeManager:CreateGroupBox(tab)
