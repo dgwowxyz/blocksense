@@ -351,7 +351,7 @@ local ThemeManager = {} do
 		groupbox:AddLabel('Outline color'):AddColorPicker('OutlineColor', { Default = self.Library.OutlineColor });
 		groupbox:AddLabel('Font color')	:AddColorPicker('FontColor', { Default = self.Library.FontColor });
 		groupbox:AddDropdown('UIFont', { Text = 'UI font', Values = self.Library:GetAvailableFonts(), Default = self.Library:GetCurrentFontName() });
-		groupbox:AddSlider('UITextSizeOffset', { Text = 'UI text size', Default = self.Library.TextSizeOffset or 14, Min = 10, Max = 24, Rounding = 0, Compact = false });
+		groupbox:AddSlider('UITextSizeOffset', { Text = 'UI text size', Default = self.Library.TextSizeOffset or 12, Min = 7, Max = 20, Rounding = 0, Compact = false });
 		groupbox:AddInput('VideoLink', { Text = '.webm Video Background (Link)', Default = self.Library.VideoLink });
 		
 		local ThemesArray = {}
