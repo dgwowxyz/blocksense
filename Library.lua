@@ -390,20 +390,46 @@ function Library:RegisterFonts(FontTable)
         return
     end
 
+    local CandidateNames = {}
+
     for Name, FontValue in next, FontTable do
         if typeof(Name) == "string" and typeof(FontValue) == "Font" then
             self.FontRegistry[Name] = FontValue
-            if not table.find(self.FontOrder, Name) then
-                table.insert(self.FontOrder, Name)
-            end
+            table.insert(CandidateNames, Name)
         end
     end
 
-    table.sort(self.FontOrder, function(a, b)
-        if a == "Code" then return true end
-        if b == "Code" then return false end
-        return a < b
+    table.sort(CandidateNames, function(a, b)
+        local aCompact = a:match("^[%w]+$") ~= nil
+        local bCompact = b:match("^[%w]+$") ~= nil
+
+        if aCompact ~= bCompact then
+            return aCompact
+        end
+
+        if #a ~= #b then
+            return #a < #b
+        end
+
+        return a:lower() < b:lower()
     end)
+
+    local SeenFonts = {}
+    local SeenNormalized = {}
+    local NewOrder = { "Code" }
+
+    for _, Name in ipairs(CandidateNames) do
+        local FontValue = self.FontRegistry[Name]
+        local NormalizedName = Name:lower():gsub("[%W_]+", "")
+
+        if not SeenFonts[FontValue] and not SeenNormalized[NormalizedName] then
+            table.insert(NewOrder, Name)
+            SeenFonts[FontValue] = true
+            SeenNormalized[NormalizedName] = true
+        end
+    end
+
+    self.FontOrder = NewOrder
 end
 
 function Library:SetFont(FontValue)
@@ -443,6 +469,12 @@ function Library:RefreshTextObjects()
                 Desc.TextSize = ApplyTextScale(GetBaseTextSize(Desc))
             end)
         end
+    end
+
+    if self.Window and self.Window.RefreshChrome then
+        pcall(function()
+            self.Window:RefreshChrome()
+        end)
     end
 
     if self.Watermark and self.WatermarkText then
@@ -6784,7 +6816,7 @@ function Library:CreateWindow(...)
 
     local WindowLabel = Library:CreateLabel({
         Position = UDim2.new(0, 7, 0, 0);
-        Size = UDim2.new(0, 0, 0, 25);
+        Size = UDim2.new(1, -14, 0, 25);
         Text = WindowInfo.Title or "";
         TextXAlignment = Enum.TextXAlignment.Left;
         ZIndex = 1;
@@ -6867,6 +6899,30 @@ function Library:CreateWindow(...)
         ZIndex = 2;
         Parent = MainSectionInner;
     })
+
+    local function GetUiTextSize()
+        return math.clamp(tonumber(Library.TextSizeOffset) or 12, 7, 20)
+    end
+
+    function Window:RefreshChrome()
+        local uiTextSize = GetUiTextSize()
+        local titleHeight = math.max(24, uiTextSize + 12)
+        local tabHeight = math.max(20, uiTextSize + 8)
+
+        WindowLabel.Size = UDim2.new(1, -14, 0, titleHeight)
+        MainSectionOuter.Position = UDim2.new(0, 8, 0, titleHeight)
+        MainSectionOuter.Size = UDim2.new(1, -16, 1, -(titleHeight + 8))
+
+        TabArea.Size = UDim2.new(1, -10, 0, tabHeight)
+        TabContainer.Position = UDim2.new(0, 8, 0, tabHeight + 4)
+        TabContainer.Size = UDim2.new(1, -16, 1, -(tabHeight + 12))
+
+        for _, ExistingTab in next, Window.Tabs do
+            if ExistingTab.RefreshButtonSize then
+                ExistingTab:RefreshButtonSize()
+            end
+        end
+    end
     
     local InnerVideoBackground = Library:Create("VideoFrame", {
         BackgroundColor3 = Library.MainColor;
@@ -7422,12 +7478,10 @@ function Library:CreateWindow(...)
             TableType = "Tab";
         }
 
-        local TabButtonWidth = Library:GetTextBounds(Tab.Name, Library.Font, 16)
-
         local TabButton = Library:Create("Frame", {
             BackgroundColor3 = Library.BackgroundColor;
             BorderColor3 = Library.OutlineColor;
-            Size = UDim2.new(0, TabButtonWidth + 8 + 4, 0.85, 0);
+            Size = UDim2.fromOffset(80, math.max(20, (tonumber(Library.TextSizeOffset) or 12) + 8));
             ZIndex = 1;
             Parent = TabArea;
         })
@@ -7444,6 +7498,14 @@ function Library:CreateWindow(...)
             ZIndex = 1;
             Parent = TabButton;
         })
+
+        function Tab:RefreshButtonSize()
+            local TabButtonWidth = Library:GetTextBounds(Tab.Name, Library.Font, 16)
+            local TabButtonHeight = math.max(20, math.clamp(tonumber(Library.TextSizeOffset) or 12, 7, 20) + 8)
+            TabButton.Size = UDim2.fromOffset(TabButtonWidth + 12, TabButtonHeight)
+        end
+
+        Tab:RefreshButtonSize()
 
         local Blocker = Library:Create("Frame", {
             BackgroundColor3 = Library.MainColor;
@@ -7746,11 +7808,8 @@ end
         function Tab:SetName(Name)
             if typeof(Name) == "string" then
                 Tab.Name = Name
-
-                local TabButtonWidth = Library:GetTextBounds(Tab.Name, Library.Font, 16)
-
-                TabButton.Size = UDim2.new(0, TabButtonWidth + 8 + 4, 0.85, 0)
                 TabButtonLabel.Text = Tab.Name
+                Tab:RefreshButtonSize()
             end
         end
 
@@ -8363,6 +8422,7 @@ end
 
     Window.Holder = Outer
     Library.Window = Window
+    Window:RefreshChrome()
 
     return Window
 end
