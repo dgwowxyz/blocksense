@@ -54,7 +54,7 @@ local ThemeManager = {} do
 
 	ThemeManager.Library = nil
 	ThemeManager.BuiltInThemes = {
-		['Default']  		  	   = { 1, { FontColor = "ffffff", MainColor = "100f1a", AccentColor = "4966ff", BackgroundColor = "000000", OutlineColor = "313131" } },
+		['Twitch']               = { 1, { FontColor = "ebebeb", MainColor = "1f1f23", AccentColor = "a970ff", BackgroundColor = "0e0e0e", OutlineColor = "2d2d2d" } },
 		['Linoria']       		   = { 2, { FontColor = "ffffff", MainColor = "1c1c1c", AccentColor = "0055ff", BackgroundColor = "141414", OutlineColor = "323232" } },
 		['Radioactive']  		     = { 3, { FontColor = "70ff59", MainColor = "000000", AccentColor = "00ff00", BackgroundColor = "000000", OutlineColor = "00ff00" } },
 		['BBot']          		   = { 4, { FontColor = "ffffff", MainColor = "1e1e1e", AccentColor = "7e48a3", BackgroundColor = "232323", OutlineColor = "141414" } },
@@ -68,11 +68,10 @@ local ThemeManager = {} do
 		['Nekocheat']     		   = { 12, { FontColor = "ffffff", MainColor = "121212", AccentColor = "e21e70", BackgroundColor = "121212", OutlineColor = "3c3c3c" } },
 		['Nekocheat Blue']		   = { 13, { FontColor = "ffffff", MainColor = "121212", AccentColor = "00f7ff", BackgroundColor = "121212", OutlineColor = "3c3c3c" } },
 		['Gamesense']  		       = { 14, { FontColor = "ebebeb", MainColor = "111111", AccentColor = "93b81a", BackgroundColor = "111111", OutlineColor = "2f2f2f" } },
-		['Twitch']               = { 15, { FontColor = "ebebeb", MainColor = "1f1f23", AccentColor = "a970ff", BackgroundColor = "0e0e0e", OutlineColor = "2d2d2d" } },
-		['misclick.lua']         = { 16, { FontColor = "ebebeb", MainColor = "121212", AccentColor = "bd00ff", BackgroundColor = "121212", OutlineColor = "34003a" } },
-		['White']                = { 17, { FontColor = "ffffff", MainColor = "181818", AccentColor = "7e7e7e", BackgroundColor = "1b1b1b", OutlineColor = "000000" } },
-		['onetap.js']            = { 18, { FontColor = "ffffff", MainColor = "000000", AccentColor = "675aff", BackgroundColor = "14131b", OutlineColor = "000000" } },
-    	['starsucks.wh']  		   = { 19, { FontColor = "ffffff", MainColor = "1b1b1b", AccentColor = "6f97ff", BackgroundColor = "111111", OutlineColor = "313131" } },
+		['misclick.lua']         = { 15, { FontColor = "ebebeb", MainColor = "121212", AccentColor = "bd00ff", BackgroundColor = "121212", OutlineColor = "34003a" } },
+		['White']                = { 16, { FontColor = "ffffff", MainColor = "181818", AccentColor = "7e7e7e", BackgroundColor = "1b1b1b", OutlineColor = "000000" } },
+		['onetap.js']            = { 17, { FontColor = "ffffff", MainColor = "000000", AccentColor = "675aff", BackgroundColor = "14131b", OutlineColor = "000000" } },
+    	['starsucks.wh']  		   = { 18, { FontColor = "ffffff", MainColor = "1b1b1b", AccentColor = "6f97ff", BackgroundColor = "111111", OutlineColor = "313131" } },
 	}
 
 	function ApplyBackgroundVideo(videoLink)
