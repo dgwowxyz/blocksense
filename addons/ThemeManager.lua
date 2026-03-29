@@ -54,24 +54,22 @@ local ThemeManager = {} do
 
 	ThemeManager.Library = nil
 	ThemeManager.BuiltInThemes = {
-		['Twitch']               = { 1, { FontColor = "ebebeb", MainColor = "1f1f23", AccentColor = "a970ff", BackgroundColor = "0e0e0e", OutlineColor = "2d2d2d" } },
-		['Linoria']       		   = { 2, { FontColor = "ffffff", MainColor = "1c1c1c", AccentColor = "0055ff", BackgroundColor = "141414", OutlineColor = "323232" } },
-		['Radioactive']  		     = { 3, { FontColor = "70ff59", MainColor = "000000", AccentColor = "00ff00", BackgroundColor = "000000", OutlineColor = "00ff00" } },
-		['BBot']          		   = { 4, { FontColor = "ffffff", MainColor = "1e1e1e", AccentColor = "7e48a3", BackgroundColor = "232323", OutlineColor = "141414" } },
-		['Fatality']      		   = { 5, { FontColor = "ffffff", MainColor = "1e1842", AccentColor = "c50754", BackgroundColor = "191335", OutlineColor = "3c355d" } },
-		['Jester']        		   = { 6, { FontColor = "ffffff", MainColor = "242424", AccentColor = "db4467", BackgroundColor = "1c1c1c", OutlineColor = "373737" } },
-		['Mint']          		   = { 7, { FontColor = "ffffff", MainColor = "242424", AccentColor = "3db488", BackgroundColor = "1c1c1c", OutlineColor = "373737" } },
-		['Tokyo Night']   		   = { 8, { FontColor = "ffffff", MainColor = "191925", AccentColor = "6759b3", BackgroundColor = "16161f", OutlineColor = "323232" } },
-		['Ubuntu']        		   = { 9, { FontColor = "ffffff", MainColor = "3e3e3e", AccentColor = "e2581e", BackgroundColor = "323232", OutlineColor = "191919" } },
-		['Quartz']       		     = { 10, { FontColor = "ffffff", MainColor = "232330", AccentColor = "426e87", BackgroundColor = "1d1b26", OutlineColor = "27232f" } },
-		['Octohook']      		   = { 11, { FontColor = "ebebeb", MainColor = "232323", AccentColor = "ff87ff", BackgroundColor = "121212", OutlineColor = "3c3c3c" } },
-		['Nekocheat']     		   = { 12, { FontColor = "ffffff", MainColor = "121212", AccentColor = "e21e70", BackgroundColor = "121212", OutlineColor = "3c3c3c" } },
-		['Nekocheat Blue']		   = { 13, { FontColor = "ffffff", MainColor = "121212", AccentColor = "00f7ff", BackgroundColor = "121212", OutlineColor = "3c3c3c" } },
-		['Gamesense']  		       = { 14, { FontColor = "ebebeb", MainColor = "111111", AccentColor = "93b81a", BackgroundColor = "111111", OutlineColor = "2f2f2f" } },
-		['misclick.lua']         = { 15, { FontColor = "ebebeb", MainColor = "121212", AccentColor = "bd00ff", BackgroundColor = "121212", OutlineColor = "34003a" } },
-		['White']                = { 16, { FontColor = "ffffff", MainColor = "181818", AccentColor = "7e7e7e", BackgroundColor = "1b1b1b", OutlineColor = "000000" } },
-		['onetap.js']            = { 17, { FontColor = "ffffff", MainColor = "000000", AccentColor = "675aff", BackgroundColor = "14131b", OutlineColor = "000000" } },
-    	['starsucks.wh']  		   = { 18, { FontColor = "ffffff", MainColor = "1b1b1b", AccentColor = "6f97ff", BackgroundColor = "111111", OutlineColor = "313131" } },
+		['default']                = { 1, { FontColor = "d1d1d1", MainColor = "151515", AccentColor = "92abd6", BackgroundColor = "111111", OutlineColor = "2f2f2f" } },
+		['linoria']       		   = { 2, { FontColor = "ffffff", MainColor = "1c1c1c", AccentColor = "0055ff", BackgroundColor = "141414", OutlineColor = "323232" } },
+		['radioactive']  		   = { 3, { FontColor = "70ff59", MainColor = "000000", AccentColor = "00ff00", BackgroundColor = "000000", OutlineColor = "00ff00" } },
+		['bitch bot']          	   = { 4, { FontColor = "ffffff", MainColor = "1e1e1e", AccentColor = "7e48a3", BackgroundColor = "232323", OutlineColor = "141414" } },
+		['fatality']      		   = { 5, { FontColor = "ffffff", MainColor = "1e1842", AccentColor = "c50754", BackgroundColor = "191335", OutlineColor = "3c355d" } },
+		['jester']        		   = { 6, { FontColor = "ffffff", MainColor = "242424", AccentColor = "db4467", BackgroundColor = "1c1c1c", OutlineColor = "373737" } },
+		['mint']          		   = { 7, { FontColor = "ffffff", MainColor = "242424", AccentColor = "3db488", BackgroundColor = "1c1c1c", OutlineColor = "373737" } },
+		['tokyo night']   		   = { 8, { FontColor = "ffffff", MainColor = "191925", AccentColor = "6759b3", BackgroundColor = "16161f", OutlineColor = "323232" } },
+		['ubuntu']        		   = { 9, { FontColor = "ffffff", MainColor = "3e3e3e", AccentColor = "e2581e", BackgroundColor = "323232", OutlineColor = "191919" } },
+		['quartz']       		   = { 10, { FontColor = "ffffff", MainColor = "232330", AccentColor = "426e87", BackgroundColor = "1d1b26", OutlineColor = "27232f" } },
+		['octohook.xyz']      	   = { 11, { FontColor = "ebebeb", MainColor = "232323", AccentColor = "ff87ff", BackgroundColor = "121212", OutlineColor = "3c3c3c" } },
+		['nekocheat']     		   = { 12, { FontColor = "ffffff", MainColor = "121212", AccentColor = "e21e70", BackgroundColor = "121212", OutlineColor = "3c3c3c" } },
+		['nekocheat blue']		   = { 13, { FontColor = "ffffff", MainColor = "121212", AccentColor = "00f7ff", BackgroundColor = "121212", OutlineColor = "3c3c3c" } },
+		['gamesense']  		       = { 14, { FontColor = "ebebeb", MainColor = "111111", AccentColor = "93b81a", BackgroundColor = "111111", OutlineColor = "2f2f2f" } },
+		['twitch']                 = { 16, { FontColor = "ebebeb", MainColor = "1f1f23", AccentColor = "a970ff", BackgroundColor = "0e0e0e", OutlineColor = "2d2d2d" } },
+		['missclick']              = { 17, { FontColor = "ebebeb", MainColor = "121212", AccentColor = "bd00ff", BackgroundColor = "121212", OutlineColor = "34003a" } },
 	}
 
 	function ApplyBackgroundVideo(videoLink)
@@ -286,7 +284,7 @@ local ThemeManager = {} do
 
 	function ThemeManager:SaveCustomTheme(file)
 		if file:gsub(' ', '') == '' then
-			self.Library:Notify('Invalid file name for theme (empty)', 3)
+			self.Library:Notify('invalid file name for theme (empty)', 3)
 			return
 		end
 
@@ -345,14 +343,14 @@ local ThemeManager = {} do
 
 	--// GUI \\--
 	function ThemeManager:CreateThemeManager(groupbox)
-		groupbox:AddLabel('Background color'):AddColorPicker('BackgroundColor', { Default = self.Library.BackgroundColor });
-		groupbox:AddLabel('Main color')	:AddColorPicker('MainColor', { Default = self.Library.MainColor });
-		groupbox:AddLabel('Accent color'):AddColorPicker('AccentColor', { Default = self.Library.AccentColor });
-		groupbox:AddLabel('Outline color'):AddColorPicker('OutlineColor', { Default = self.Library.OutlineColor });
-		groupbox:AddLabel('Font color')	:AddColorPicker('FontColor', { Default = self.Library.FontColor });
-		groupbox:AddDropdown('UIFont', { Text = 'UI font', Values = self.Library:GetAvailableFonts(), Default = self.Library:GetCurrentFontName() });
-		groupbox:AddSlider('UITextSizeOffset', { Text = 'UI text size', Default = self.Library.TextSizeOffset or 12, Min = 7, Max = 20, Rounding = 0, Compact = false });
-		groupbox:AddInput('VideoLink', { Text = '.webm Video Background (Link)', Default = self.Library.VideoLink });
+		groupbox:AddLabel('Background color'):AddColorPicker('BackgroundColor', { Text = 'background color', Default = self.Library.BackgroundColor });
+		groupbox:AddLabel('Main color')	:AddColorPicker('MainColor', { Text = 'main color', Default = self.Library.MainColor });
+		groupbox:AddLabel('Accent color'):AddColorPicker('AccentColor', { Text = 'accent color', Default = self.Library.AccentColor });
+		groupbox:AddLabel('Outline color'):AddColorPicker('OutlineColor', { Text = 'outline color', Default = self.Library.OutlineColor });
+		groupbox:AddLabel('Font color')	:AddColorPicker('FontColor', Text = 'font color', { Default = self.Library.FontColor });
+		groupbox:AddDropdown('UIFont', { Text = 'ui font', Values = self.Library:GetAvailableFonts(), Default = self.Library:GetCurrentFontName() });
+		groupbox:AddSlider('UITextSizeOffset', { Text = 'ui text size', Default = self.Library.TextSizeOffset or 12, Min = 7, Max = 20, Rounding = 0, Compact = false });
+		groupbox:AddInput('VideoLink', { Text = '.webm video background (link)', Default = self.Library.VideoLink });
 		
 		local ThemesArray = {}
 		for Name, Theme in next, self.BuiltInThemes do
@@ -363,7 +361,7 @@ local ThemeManager = {} do
 
 		groupbox:AddDivider()
 
-		groupbox:AddDropdown('ThemeManager_ThemeList', { Text = 'Theme list', Values = ThemesArray, Default = 1 })
+		groupbox:AddDropdown('ThemeManager_ThemeList', { Text = 'theme list', Values = ThemesArray, Default = 1 })
 		groupbox:AddButton('Set as default', function()
 			self:SaveDefault(self.Library.Options.ThemeManager_ThemeList.Value)
 			self.Library:Notify(string.format('Set default theme to %q', self.Library.Options.ThemeManager_ThemeList.Value))
@@ -375,7 +373,7 @@ local ThemeManager = {} do
 
 		groupbox:AddDivider()
 
-		groupbox:AddInput('ThemeManager_CustomThemeName', { Text = 'Custom theme name' })
+		groupbox:AddInput('ThemeManager_CustomThemeName', { Text = 'custom theme name' })
 		groupbox:AddButton('Create theme', function() 
 			local name = self.Library.Options.ThemeManager_CustomThemeName.Value
 			if name:gsub(" ", "") == "" then
@@ -392,50 +390,50 @@ local ThemeManager = {} do
 
 		groupbox:AddDivider()
 
-		groupbox:AddDropdown('ThemeManager_CustomThemeList', { Text = 'Custom themes', Values = self:ReloadCustomThemes(), AllowNull = true, Default = 1 })
+		groupbox:AddDropdown('ThemeManager_CustomThemeList', { Text = 'custom themes', Values = self:ReloadCustomThemes(), AllowNull = true, Default = 1 })
 		groupbox:AddButton('Load theme', function()
 			local name = self.Library.Options.ThemeManager_CustomThemeList.Value
 
 			self:ApplyTheme(name)
-			self.Library:Notify(string.format('Loaded theme %q', name))
+			self.Library:Notify(string.format('loaded theme %q', name))
 		end)
-		groupbox:AddButton('Overwrite theme', function()
+		groupbox:AddButton('overwrite theme', function()
 			local name = self.Library.Options.ThemeManager_CustomThemeList.Value
 
 			self:SaveCustomTheme(name)
-			self.Library:Notify(string.format('Overwrote config %q', name))
+			self.Library:Notify(string.format('overwrote config %q', name))
 		end)
-		groupbox:AddButton('Delete theme', function()
+		groupbox:AddButton('delete theme', function()
 			local name = self.Library.Options.ThemeManager_CustomThemeList.Value
 
 			local success, err = self:Delete(name)
 			if not success then
-				self.Library:Notify('Failed to delete theme: ' .. err)
+				self.Library:Notify('failed to delete theme: ' .. err)
 				return
 			end
 
-			self.Library:Notify(string.format('Deleted theme %q', name))
+			self.Library:Notify(string.format('deleted theme %q', name))
 			self.Library.Options.ThemeManager_CustomThemeList:SetValues(self:ReloadCustomThemes())
 			self.Library.Options.ThemeManager_CustomThemeList:SetValue(nil)
 		end)
-		groupbox:AddButton('Refresh list', function()
+		groupbox:AddButton('refresh list', function()
 			self.Library.Options.ThemeManager_CustomThemeList:SetValues(self:ReloadCustomThemes())
 			self.Library.Options.ThemeManager_CustomThemeList:SetValue(nil)
 		end)
-		groupbox:AddButton('Set as default', function()
+		groupbox:AddButton('set as default', function()
 			if self.Library.Options.ThemeManager_CustomThemeList.Value ~= nil and self.Library.Options.ThemeManager_CustomThemeList.Value ~= '' then
 				self:SaveDefault(self.Library.Options.ThemeManager_CustomThemeList.Value)
 				self.Library:Notify(string.format('Set default theme to %q', self.Library.Options.ThemeManager_CustomThemeList.Value))
 			end
 		end)
-		groupbox:AddButton('Reset default', function()
+		groupbox:AddButton('reset default', function()
 			local success = pcall(delfile, self.Folder .. '/themes/default.txt')
 			if not success then 
-				self.Library:Notify('Failed to reset default: delete file error')
+				self.Library:Notify('failed to reset default: delete file error')
 				return
 			end
 				
-			self.Library:Notify('Set default theme to nothing')
+			self.Library:Notify('set default theme to nothing')
 			self.Library.Options.ThemeManager_CustomThemeList:SetValues(self:ReloadCustomThemes())
 			self.Library.Options.ThemeManager_CustomThemeList:SetValue(nil)
 		end)
