@@ -284,7 +284,7 @@ local ThemeManager = {} do
 
 	function ThemeManager:SaveCustomTheme(file)
 		if file:gsub(' ', '') == '' then
-			self.Library:Notify('invalid file name for theme (empty)', 3)
+			self.Library:Notify('Invalid file name for theme (empty)', 3)
 			return
 		end
 
@@ -343,14 +343,14 @@ local ThemeManager = {} do
 
 	--// GUI \\--
 	function ThemeManager:CreateThemeManager(groupbox)
-		groupbox:AddLabel('Background color'):AddColorPicker('BackgroundColor', { Text = 'background color', Default = self.Library.BackgroundColor });
-		groupbox:AddLabel('Main color')	:AddColorPicker('MainColor', { Text = 'main color', Default = self.Library.MainColor });
-		groupbox:AddLabel('Accent color'):AddColorPicker('AccentColor', { Text = 'accent color', Default = self.Library.AccentColor });
-		groupbox:AddLabel('Outline color'):AddColorPicker('OutlineColor', { Text = 'outline color', Default = self.Library.OutlineColor });
-		groupbox:AddLabel('Font color')	:AddColorPicker('FontColor', Text = 'font color', { Default = self.Library.FontColor });
-		groupbox:AddDropdown('UIFont', { Text = 'ui font', Values = self.Library:GetAvailableFonts(), Default = self.Library:GetCurrentFontName() });
-		groupbox:AddSlider('UITextSizeOffset', { Text = 'ui text size', Default = self.Library.TextSizeOffset or 12, Min = 7, Max = 20, Rounding = 0, Compact = false });
-		groupbox:AddInput('VideoLink', { Text = '.webm video background (link)', Default = self.Library.VideoLink });
+		groupbox:AddLabel('Background color'):AddColorPicker('BackgroundColor', { Default = self.Library.BackgroundColor });
+		groupbox:AddLabel('Main color')	:AddColorPicker('MainColor', { Default = self.Library.MainColor });
+		groupbox:AddLabel('Accent color'):AddColorPicker('AccentColor', { Default = self.Library.AccentColor });
+		groupbox:AddLabel('Outline color'):AddColorPicker('OutlineColor', { Default = self.Library.OutlineColor });
+		groupbox:AddLabel('Font color')	:AddColorPicker('FontColor', { Default = self.Library.FontColor });
+		groupbox:AddDropdown('UIFont', { Text = 'UI font', Values = self.Library:GetAvailableFonts(), Default = self.Library:GetCurrentFontName() });
+		groupbox:AddSlider('UITextSizeOffset', { Text = 'UI text size', Default = self.Library.TextSizeOffset or 12, Min = 7, Max = 20, Rounding = 0, Compact = false });
+		groupbox:AddInput('VideoLink', { Text = '.webm Video Background (Link)', Default = self.Library.VideoLink });
 		
 		local ThemesArray = {}
 		for Name, Theme in next, self.BuiltInThemes do
@@ -361,7 +361,7 @@ local ThemeManager = {} do
 
 		groupbox:AddDivider()
 
-		groupbox:AddDropdown('ThemeManager_ThemeList', { Text = 'theme list', Values = ThemesArray, Default = 1 })
+		groupbox:AddDropdown('ThemeManager_ThemeList', { Text = 'Theme list', Values = ThemesArray, Default = 1 })
 		groupbox:AddButton('Set as default', function()
 			self:SaveDefault(self.Library.Options.ThemeManager_ThemeList.Value)
 			self.Library:Notify(string.format('Set default theme to %q', self.Library.Options.ThemeManager_ThemeList.Value))
@@ -373,7 +373,7 @@ local ThemeManager = {} do
 
 		groupbox:AddDivider()
 
-		groupbox:AddInput('ThemeManager_CustomThemeName', { Text = 'custom theme name' })
+		groupbox:AddInput('ThemeManager_CustomThemeName', { Text = 'Custom theme name' })
 		groupbox:AddButton('Create theme', function() 
 			local name = self.Library.Options.ThemeManager_CustomThemeName.Value
 			if name:gsub(" ", "") == "" then
@@ -390,50 +390,50 @@ local ThemeManager = {} do
 
 		groupbox:AddDivider()
 
-		groupbox:AddDropdown('ThemeManager_CustomThemeList', { Text = 'custom themes', Values = self:ReloadCustomThemes(), AllowNull = true, Default = 1 })
+		groupbox:AddDropdown('ThemeManager_CustomThemeList', { Text = 'Custom themes', Values = self:ReloadCustomThemes(), AllowNull = true, Default = 1 })
 		groupbox:AddButton('Load theme', function()
 			local name = self.Library.Options.ThemeManager_CustomThemeList.Value
 
 			self:ApplyTheme(name)
-			self.Library:Notify(string.format('loaded theme %q', name))
+			self.Library:Notify(string.format('Loaded theme %q', name))
 		end)
-		groupbox:AddButton('overwrite theme', function()
+		groupbox:AddButton('Overwrite theme', function()
 			local name = self.Library.Options.ThemeManager_CustomThemeList.Value
 
 			self:SaveCustomTheme(name)
-			self.Library:Notify(string.format('overwrote config %q', name))
+			self.Library:Notify(string.format('Overwrote config %q', name))
 		end)
-		groupbox:AddButton('delete theme', function()
+		groupbox:AddButton('Delete theme', function()
 			local name = self.Library.Options.ThemeManager_CustomThemeList.Value
 
 			local success, err = self:Delete(name)
 			if not success then
-				self.Library:Notify('failed to delete theme: ' .. err)
+				self.Library:Notify('Failed to delete theme: ' .. err)
 				return
 			end
 
-			self.Library:Notify(string.format('deleted theme %q', name))
+			self.Library:Notify(string.format('Deleted theme %q', name))
 			self.Library.Options.ThemeManager_CustomThemeList:SetValues(self:ReloadCustomThemes())
 			self.Library.Options.ThemeManager_CustomThemeList:SetValue(nil)
 		end)
-		groupbox:AddButton('refresh list', function()
+		groupbox:AddButton('Refresh list', function()
 			self.Library.Options.ThemeManager_CustomThemeList:SetValues(self:ReloadCustomThemes())
 			self.Library.Options.ThemeManager_CustomThemeList:SetValue(nil)
 		end)
-		groupbox:AddButton('set as default', function()
+		groupbox:AddButton('Set as default', function()
 			if self.Library.Options.ThemeManager_CustomThemeList.Value ~= nil and self.Library.Options.ThemeManager_CustomThemeList.Value ~= '' then
 				self:SaveDefault(self.Library.Options.ThemeManager_CustomThemeList.Value)
 				self.Library:Notify(string.format('Set default theme to %q', self.Library.Options.ThemeManager_CustomThemeList.Value))
 			end
 		end)
-		groupbox:AddButton('reset default', function()
+		groupbox:AddButton('Reset default', function()
 			local success = pcall(delfile, self.Folder .. '/themes/default.txt')
 			if not success then 
-				self.Library:Notify('failed to reset default: delete file error')
+				self.Library:Notify('Failed to reset default: delete file error')
 				return
 			end
 				
-			self.Library:Notify('set default theme to nothing')
+			self.Library:Notify('Set default theme to nothing')
 			self.Library.Options.ThemeManager_CustomThemeList:SetValues(self:ReloadCustomThemes())
 			self.Library.Options.ThemeManager_CustomThemeList:SetValue(nil)
 		end)
